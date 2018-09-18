@@ -80,12 +80,12 @@ class Vector3
 
     __host__ __device__ inline float Length() const 
     {
-        return std::sqrt(e[0]*e[1] + e[1]*e[1] + e[2]*e[2]);
+        return std::sqrt(e[0]*e[0] + e[1]*e[1] + e[2]*e[2]);
     }
 
     __host__ __device__ inline float SquaredLength() const 
     {
-        return (e[0]*e[1] + e[1]*e[1] + e[2]*e[2]);
+        return (e[0]*e[0] + e[1]*e[1] + e[2]*e[2]);
     }
 
     __host__ __device__ inline void MakeUnitVector()
