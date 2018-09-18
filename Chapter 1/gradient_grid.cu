@@ -1,6 +1,7 @@
 #include <fstream>
 #include <iostream>
 #include <string>
+#include "../Common/ImageWriter.cuh"
 
 const int ImageWidth = 1024;
 const int ImageHeight = 512;
@@ -52,19 +53,14 @@ void SaveImage(std::string fileName, int width, int height, PixelColor* pixels)
 
 int main(int argc, char** argv)
 {
-  // Get image file name
-  std::string fileName = "gradient_grid.ppm";
-  if (argc > 1)
-  {
-      fileName = argv[1];
-  }
-
+  std::string fileName = ImageWriter::GetFileName(argc, argv);
+  
   // Allocate Unified Memory – accessible from CPU or GPU
   int numPixels = ImageWidth*ImageHeight;
   PixelColor *pixels;
   cudaMallocManaged(&pixels, numPixels*sizeof(PixelColor));
 
-  // Run kernel on 1M elements on the GPU
+  // Run kernel on the GPU
   int numBlocks = (numPixels + BlockSize - 1) / BlockSize;
   CalculatePixelColors<<<numBlocks, BlockSize>>>(ImageWidth, ImageHeight, pixels);
 

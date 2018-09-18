@@ -1,8 +1,6 @@
-#include <fstream>
-#include <iostream>
-#include <string>
-#include "Ray.cuh"
-#include "Vector3.cuh"
+#include "../Common/ImageWriter.cuh"
+#include "../Common/Ray.cuh"
+#include "../Common/Vector3.cuh"
 
 const int ImageWidth = 1024;
 const int ImageHeight = 512;
@@ -39,35 +37,10 @@ void CalculateImage(int width, int height, Vector3* pixels)
     }
 }
 
-void SaveImage(std::string fileName, int width, int height, Vector3* pixels)
-{
-  std::ofstream imageFile;
-  imageFile.open(fileName.c_str());
-  imageFile << "P3" << std::endl  << width << " " << height << std::endl << 255 << std::endl;
-  int k = 0;
-  for (int j = 0; j < height; ++j)
-  {
-      for (int i = 0; i < width; ++i)
-      {
-          int ir = static_cast<int>(255.99 * pixels[k].R());
-          int ig = static_cast<int>(255.99 * pixels[k].G());
-          int ib = static_cast<int>(255.99 * pixels[k].B());
-          imageFile << ir << " " << ig << " " << ib << std::endl;
-          k++;
-      }
-  }
-  imageFile.close();
-}
-
 int main(int argc, char** argv)
 {
-  // Get image file name
-  std::string fileName = "simpleRay.ppm";
-  if (argc > 1)
-  {
-      fileName = argv[1];
-  }
-
+  std::string fileName = ImageWriter::GetFileName(argc, argv);
+  
   // Allocate Unified Memory – accessible from CPU or GPU
   int numPixels = ImageWidth*ImageHeight;
   Vector3 *pixels;
@@ -80,7 +53,7 @@ int main(int argc, char** argv)
   // Wait for GPU to finish before accessing on host
   cudaDeviceSynchronize();
 
-  SaveImage(fileName, ImageWidth, ImageHeight, pixels);
+  ImageWriter::WritePPM(fileName, ImageWidth, ImageHeight, pixels);
 
   // Free memory
   cudaFree(pixels);
